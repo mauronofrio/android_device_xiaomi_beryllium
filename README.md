@@ -6,7 +6,6 @@ For building TWRP for Xiaomi PocoPhone F1
 Works:
 
 - ADB
-- Decryption of /data
 - Screen brightness settings
 - Now UI is very smooth
 - Vibration on touch

@@ -1,5 +1,7 @@
 #
-# Copyright 2018 The Android Open Source Project
+# Copyright 2017 The Android Open Source Project
+#
+# Copyright (C) 2019-2020 OrangeFox Recovery Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,6 +25,8 @@
 # *not* include it on all devices, so it is safe even with hardware-specific
 # components.
 
+LOCAL_PATH := device/xiaomi/beryllium
+
 # Architecture
 TARGET_ARCH := arm64
 TARGET_ARCH_VARIANT := armv8-a
@@ -37,29 +41,32 @@ TARGET_2ND_CPU_ABI2 := armeabi
 TARGET_2ND_CPU_VARIANT := cortex-a9
 TARGET_USES_64_BIT_BINDER := true
 
-ENABLE_CPUSETS := true
-ENABLE_SCHEDBOOST := true
+TARGET_USES_64_BIT_BINDER := true
 
 # Bootloader
 TARGET_BOOTLOADER_BOARD_NAME := sdm845
 TARGET_NO_BOOTLOADER := true
 
+# Crypto
+TARGET_CRYPTFS_HW_PATH := vendor/qcom/opensource/commonsys/cryptfs_hw
+TARGET_HW_DISK_ENCRYPTION := true
+TW_INCLUDE_CRYPTO := true
+TW_INCLUDE_CRYPTO_FBE := true
+TW_INCLUDE_FBE := true
+
 # Kernel
-BOARD_KERNEL_CMDLINE := console=ttyMSM0,115200n8 earlycon=msm_geni_serial,0xA84000 androidboot.hardware=qcom androidboot.console=ttyMSM0 video=vfb:640x400,bpp=32,memsize=3072000 msm_rtb.filter=0x237 ehci-hcd.park=3 lpm_levels.sleep_disabled=1 service_locator.enable=1 swiotlb=2048 androidboot.configfs=true firmware_class.path=/vendor/firmware_mnt/image loop.max_part=7 androidboot.usbcontroller=a600000.dwc3 androidboot.selinux=permissive
+BOARD_KERNEL_CMDLINE := console=ttyMSM0,115200n8 earlycon=msm_geni_serial,0xA84000 androidboot.hardware=qcom androidboot.console=ttyMSM0 video=vfb:640x400,bpp=32,memsize=3072000 msm_rtb.filter=0x237 ehci-hcd.park=3 lpm_levels.sleep_disabled=1 service_locator.enable=1 swiotlb=2048 androidboot.configfs=true loop.max_part=7 androidboot.usbcontroller=a600000.dwc3 androidboot.selinux=permissive
 BOARD_KERNEL_BASE := 0x00000000
 BOARD_KERNEL_PAGESIZE := 4096
 BOARD_KERNEL_TAGS_OFFSET := 0x00000100
 BOARD_RAMDISK_OFFSET     := 0x01000000
-TARGET_PREBUILT_KERNEL := device/xiaomi/beryllium/Image.gz-dtb
-BOARD_KERNEL_IMAGE_NAME := Image.gz-dtb
-NEED_KERNEL_MODULE_SYSTEM := true
-TARGET_KERNEL_ARCH := arm64
-#TARGET_KERNEL_CONFIG := beryllium_defconfig
-#TARGET_KERNEL_CROSS_COMPILE_PREFIX := aarch64-linux-android-
-#TARGET_KERNEL_SOURCE := kernel/xiaomi/sdm845
+
+TARGET_PREBUILT_KERNEL := $(LOCAL_PATH)/prebuilt/Image.gz-dtb
+
+TARGET_RECOVERY_FSTAB := $(LOCAL_PATH)/recovery.fstab
 
 # Platform
-TARGET_BOARD_PLATFORM := sdm845
+TARGET_BOARD_PLATFORM := sdm660
 TARGET_BOARD_PLATFORM_GPU := qcom-adreno630
 
 # Partitions
@@ -78,38 +85,42 @@ TARGET_USERIMAGES_USE_EXT4 := true
 TARGET_USERIMAGES_USE_F2FS := true
 
 # Workaround for error copying vendor files to recovery ramdisk
+BOARD_VENDORIMAGE_FILE_SYSTEM_TYPE := ext4
 TARGET_COPY_OUT_VENDOR := vendor
 
 # Recovery
-TARGET_OTA_ASSERT_DEVICE := beryllium
 BOARD_HAS_LARGE_FILESYSTEM := true
-BOARD_HAS_NO_SELECT_BUTTON := true
-
-# Android Verified Boot
-BOARD_AVB_ENABLE := false
-BOARD_BUILD_DISABLED_VBMETAIMAGE := true
-
-# Crypto
-TW_INCLUDE_CRYPTO := true
-TW_INCLUDE_FBE := true
+TARGET_RECOVERY_PIXEL_FORMAT := "RGBX_8888"
+AB_OTA_UPDATER := false
+#LZMA_RAMDISK_TARGETS := recovery
 
 # TWRP specific build flags
-TW_THEME := portrait_hdpi
+TARGET_OTA_ASSERT_DEVICE := beryllium
 RECOVERY_SDCARD_ON_DATA := true
-BOARD_HAS_NO_REAL_SDCARD := true
 TARGET_RECOVERY_QCOM_RTC_FIX := true
-TARGET_RECOVERY_PIXEL_FORMAT := "BGRA_8888"
 TW_BRIGHTNESS_PATH := "/sys/class/backlight/panel0-backlight/brightness"
-TW_MAX_BRIGHTNESS := 4095
-TW_DEFAULT_BRIGHTNESS := 1500
-TW_Y_OFFSET := 80
-TW_H_OFFSET := -80
-TW_INCLUDE_NTFS_3G := true
-TW_EXCLUDE_SUPERSU := true
-TW_EXTRA_LANGUAGES := true
-TW_INPUT_BLACKLIST := "hbtp_vm"
 TW_EXCLUDE_DEFAULT_USB_INIT := true
+TW_EXTRA_LANGUAGES := true
+TW_DEFAULT_LANGUAGE := en
+TW_INCLUDE_NTFS_3G := true
+TW_INPUT_BLACKLIST := "hbtp_vm"
+TW_MAX_BRIGHTNESS := 4095
+TW_DEFAULT_BRIGHTNESS := 1950
+TW_THEME := portrait_hdpi
+TW_SCREEN_BLANK_ON_BOOT := true
 TWRP_INCLUDE_LOGCAT := true
 TARGET_USES_LOGD := true
+TW_Y_OFFSET := 80
+TW_H_OFFSET := -80
 TW_USE_TOOLBOX := true
+
+# Hack: prevent anti rollback
 PLATFORM_SECURITY_PATCH := 2099-12-31
+PLATFORM_VERSION := 16.1.0
+
+# exFAT FS Support
+TW_INCLUDE_FUSE_EXFAT := true
+
+# NTFS Support
+TW_INCLUDE_FUSE_NTFS := true
+#
